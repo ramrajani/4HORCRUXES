@@ -12,7 +12,7 @@
             </div>
               <br>
              <div class="container" align="center" >
-        <button type="button" class="btn btn-danger" id="stoprec" onclick="stopRecording()">Stop Recording</button>
+        <button type="button" class="btn btn-danger" id="stoprec"  class="pausenow" onclick="stopRecording()">Stop Recording</button>
       </div>
     </div>
 <script src="recorder.js"></script> 
@@ -45,8 +45,31 @@ clearInterval(yo);
 
 
 });
+setTimeout(function() {
+    $(".pausenow").trigger('click');
+  }, 5000);
 
 
+$('.pausenow').on('click',function(){
+
+
+    $.ajax({
+url:location.origin+"/data/api/category?cat="+level,
+type:"GET",
+dataType: 'json',
+data:{},
+headers: {
+'Content-Type':'application/json' 
+},
+success:function(data) {
+   console.log(data);
+    
+}
+}
+);
+
+
+})
 </script>
 
 
