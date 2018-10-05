@@ -1,0 +1,53 @@
+<% include partials/header.ejs %>
+<% include partials/middle.ejs %>
+
+  <div style="padding-top:10%">   
+<div class="container" align="center">
+        <button type="button" class="btn btn-success" id="startrec" onclick="startRecording()">Start Recording</button>
+      </div>
+      
+              <br>
+              <div align="center">
+              <textarea rows=1 cols=7 id="time" name="timer" disabled  style="overflow:hidden;width:25%;height:100%;font-family:Courier; color:Blue; font-size:300%;"></textarea>
+            </div>
+              <br>
+             <div class="container" align="center" >
+        <button type="button" class="btn btn-danger" id="stoprec" onclick="stopRecording()">Stop Recording</button>
+      </div>
+    </div>
+<script src="recorder.js"></script> 
+<script>
+    var yo;
+$('#startrec').on("click",function(){
+
+   var sec=0,hr=0,min=0;
+		yo=setInterval(function timer(){
+			if(sec==59){
+				sec=0;
+				min=min+1;
+			}else{
+				sec++;
+			}
+			if(min==60){
+				min=0
+				hr=hr+1;
+			}
+			$("#time").val(hr+":"+min+":"+sec);
+		},1000);
+
+
+});
+$('#stoprec').on("click",function(){
+
+
+clearInterval(yo);
+
+
+
+});
+
+
+</script>
+
+
+<% include partials/footer.ejs %>
