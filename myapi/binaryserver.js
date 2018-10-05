@@ -1,5 +1,6 @@
 var BinaryServer = require('binaryjs').BinaryServer;
 var wav = require('wav');
+var sppechtotext = require("./speechtotext.js");
 
 
 
@@ -24,6 +25,7 @@ soundrecserver:function(){
   
       stream.on('end', function() {
         fileWriter.end();
+        sppechtotext.textspeech('./'+outFile);
         console.log('wrote to file ' + outFile);
       });
     });

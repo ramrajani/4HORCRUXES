@@ -1,24 +1,30 @@
 var lexrak=require('lexrank');
-
-module.exports={
-  
-  summarize: function(content){
+var SpeechToTextV1 = require('watson-developer-cloud/speech-to-text/v1');
+var context = require("../database/context.js");
+function summarize(content){
 
     
-            var topLines=lexrak.summarize(content,5,function(err,toplines,text){
-                if(err){
-                    console.log(err);
-                }
-                console.log(text);
-                
-                });
+    var topLines=lexrak.summarize(content,5,function(err,toplines,text){
+        if(err){
+            console.log(err);
+        }
+        console.log(text);
+        context.findOneAndUpdate({tid:1},{tid:1,desp:text},{ upsert: true, new: true, setDefaultsOnInsert: true },function(err,description){
+            if(!err){
+              console.log(description);
+            }
+        })
+        });
 
 
-  },
+}
+module.exports={
+  
+ 
 
   textspeech:function(filename){
 
-    var SpeechToTextV1 = require('watson-developer-cloud/speech-to-text/v1');
+   
 
 
     var speechToText = new SpeechToTextV1({
@@ -42,17 +48,27 @@ module.exports={
         timestamps: true,
         word_alternatives_threshold: 0.9,
         keywords: ['colorado', 'tornado', 'tornadoes'],
-    
         keywords_threshold: 0.5
      };
     speechToText.recognize(params, function (error, transcript) {
      if (error)
           console.log('Error:', error);
      else{
-        console.log(JSON.stringify(transcript, null, 2));
-        console.log(transcript.results[0].alternatives[0].transcript);
-        
-       }
+         console.log(transcript);
+         
+        //console.log(JSON.stringify(transcript, null, 2));
+        if(transcript.results.length!=0){
+            var temp="";
+            for(var i=0;i<transcript.results.length;i++){
+               temp +=transcript.results[i].alternatives[0].transcript;
+              }
+           summarize(temp);
+          
+
+
+        }
+      
+               }
       });
      }
 
