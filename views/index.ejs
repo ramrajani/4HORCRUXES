@@ -1,19 +1,61 @@
 <% include partials/header.ejs %>
 <% include partials/middle.ejs %>
 
-  <div style="padding-top:10%">   
+
+
+  <div style="padding-top:5%">   
+    <div class="container">
+        <% if(CurrentUser){ %>
+            <input type="text" id="eventname" class="form-control" placeholder="EventName" required> 
+            <button id="save" class="btn btn-warning" style="float:right">save</button>
+            <% } %>        
+        </div>
 <div class="container" align="center">
+             
+        
+         
+
+           <br><br>
+            
+
         <button type="button" class="btn btn-success" id="startrec" onclick="startRecording()">Start Recording</button>
-      </div>
+    
       
               <br>
+              <br>
               <div align="center">
-              <textarea rows=1 cols=7 id="time" name="timer" disabled  style="overflow:hidden;width:25%;height:100%;font-family:Courier; color:Blue; font-size:300%;"></textarea>
+              <textarea rows=1 cols=7 id="time" name="timer" class="form-control" disabled  style="overflow:hidden;width:50%;height:100%;font-family:Courier; color:Blue; font-size:250%;"></textarea>
             </div>
               <br>
              <div class="container" align="center" >
         <button type="button" class="btn btn-danger" id="stoprec"  class="pausenow" onclick="stopRecording()">Stop Recording</button>
-      </div>
+      
+    </div>
+    <br>
+    <div>
+            <input type="email" cols="20" id="emailtosend" class="form-control" placeholder="enter email"></input>
+            <button type="button" class="btn btn-primary btn-sm" id="sendmailmine">send</button>
+    </div>
+      <br>
+      <label>Recorded Speech</label><br>
+      <textarea name="recordedspeech" class="form-control" col="5000" style="top: 10%;
+right: 0;
+bottom: 0;
+left: 0;
+width:100%;
+background-color: black;
+  color: white;" id="recordspeech"></textarea>
+<label>Summary</label><br>
+<textarea name="summaryspeech"  col="5000" style="top: 10%;
+right: 0;
+bottom: 0;
+left: 0;
+width:100%;
+background-color: black;
+color: white;"class="form-control" id="summary"></textarea>
+
+    </div>
+    
     </div>
 <script src="recorder.js"></script> 
 <script>
@@ -53,8 +95,8 @@ setTimeout(function() {
 $('.pausenow').on('click',function(){
 
 
-    $.ajax({
-url:location.origin+"/data/api/category?cat="+level,
+      $.ajax({
+url:location.origin+"/api/data/texttospeech",
 type:"GET",
 dataType: 'json',
 data:{},
@@ -63,13 +105,81 @@ headers: {
 },
 success:function(data) {
    console.log(data);
-    
+   $("textarea[name='recordedspeech']").val(data);  
 }
 }
 );
 
 
+ $.ajax({
+url:location.origin+"/api/data/summarization",
+type:"GET",
+dataType: 'json',
+data:{},
+headers: {
+'Content-Type':'application/json' 
+},
+success:function(data) {
+   console.log(data);
+   $("textarea[name='summaryspeech']").val(data);
+}
+}
+);
+
+
+
+
 })
+
+$('#sendmailmine').on("click",function(){
+
+$.ajax({
+url:location.origin+"/api/data/mail?email="+$('#emailtosend').val()+"&summarydata="+$("textarea[name='summaryspeech']").val(),
+type:"GET",
+dataType: 'json',
+data:{},
+headers: {
+'Content-Type':'application/json' 
+},
+success:function(data) {
+  console.log(data);
+   
+}
+}
+);
+alert('Mail sent');
+
+})
+
+ $('#save').on("click",function(){
+
+    $.ajax({
+    url:location.origin+"/api/data/save?eventname="+$('#eventname').val()+"&context="+$("textarea[name='summaryspeech']").val()+"&desp="+$("textarea[name='recordedspeech']").val(),
+    type:"GET",
+    dataType: 'json',
+    data:{},
+    headers: {
+    'Content-Type':'application/json' 
+    },
+    success:function(data) {
+    console.log(data);
+    
+    }
+    }
+    );
+
+
+alert('saved Successfully');
+ })
+
+
+
+
+
+   
+
+
+
 </script>
 
 

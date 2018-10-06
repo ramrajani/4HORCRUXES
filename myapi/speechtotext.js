@@ -12,14 +12,17 @@ function dataready(transcript){
      var temp =transcript.results[i].alternatives[0].timestamps;
      for(var j=0;j<temp.length;j++){
        var temparray =temp[j];
+      if(transcript.speaker_labels){
+        for(var z=0;z<transcript.speaker_labels.length;z++){
+            var temp2 = transcript.speaker_labels[z];
+            if(temp2.from==temparray[1] && temp2.to==temparray[2]){
+                temparray.push(temp2.speaker);
+                superarray.push(temparray);
+            }
+  
 
-       for(var z=0;z<transcript.speaker_labels.length;z++){
-          var temp2 = transcript.speaker_labels[z];
-          if(temp2.from==temparray[1] && temp2.to==temparray[2]){
-              temparray.push(temp2.speaker);
-              superarray.push(temparray);
-          }
-
+      }
+       
        }
      }
    }
@@ -57,7 +60,10 @@ var promisedisplay = Q.denodeify(dataready);
 function summarize(content){
 
     
-    var topLines=lexrak.summarize(content,5,function(err,toplines,text){
+var c =content.split(/\r\n|\r|\n/).length
+var max=Math.max(c/20,1);
+
+    var topLines=lexrak.summarize(content,max,function(err,toplines,text){
         if(err){
             console.log(err);
         }

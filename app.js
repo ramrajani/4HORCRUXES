@@ -6,7 +6,10 @@ const express    = require('express'),
       LocalStrategy =require('passport-local'),
       passportLocalMongoose = require('passport-local-mongoose'),
       bodyParser  = require('body-parser'),
-      binaryserver =require('./myapi/binaryserver.js');
+      binaryserver =require('./myapi/binaryserver.js'),
+      context = require("./database/context.js"),
+      textconverted = require("./database/textconverted.js"),
+      mailsender = require("./myapi/sendmail.js");
 
 
       
@@ -19,10 +22,10 @@ app.use(require('express-session')({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-/* passport.use(new LocalStrategy(User.authenticate()));
+passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
- */
+
 
 app.use(express.static(__dirname + '/styles'));
 app.use(morgan('combined'));
@@ -66,18 +69,8 @@ app.post("/register",function(req,res){
 
 
 
-    User.register(new User({ image:req.body.url,
-     username:req.body.username,
-     fullname:req.body.fullname,
-     country :req.body.country,
-     city:req.body.city,
-   
-   
-     state:req.body.state,
-     occupation:req.body.occupation,
-     organization:req.body.organization,
-     band:req.body.band,
-     emailid:req.body.email
+    User.register(new User({ 
+     username:req.body.username,emailid:req.body.email
                          }),req.body.password,function(err,user){
                 if(err){
                     console.log(err);
@@ -104,13 +97,45 @@ app.post("/register",function(req,res){
  });
 
 
+// api for data
 
+app.get("/api/data/texttospeech",function(req,res){
+    textconverted.find({},function(err,data){
+        res.send(data);
+    });
+});
 
+app.get("/api/data/summarization",function(req,res){
+    context.find({},function(err,data){
+        res.send(data);
 
+    });
+});
 
+// send mail 
+app.get("/api/data/mail",mailsender.sendmymail);
 
+// save data
+app.get("/api/data/save",function(req,res){
+     
+    User.update({ username: req.user.username },{ $push: { datastore:{
+        name:req.query.eventname,desp:req.query.desp,context:req.query.context
+       
+     } } },function(err,data){
+         if(err){
+             console.log(err);
 
+         }
+         else{
+             res.send("saved successfully");
+         }
+     })
 
+})
+
+app.get('/userminute',function(req,res){
+    res.render("userminutes",{CurrentUser:req.user,eventname:req.query.eventname});
+})
 
 
 

@@ -1,31 +1,35 @@
 <% include partials/header.ejs %>
 <% include partials/middle.ejs %>
 
-
-<div class="conatiner">
-<div id="emailid">
-
-
-</div>
+<div class="container">
+<div><span><%=CurrentUser.username %></span>&nbsp;<span><%=CurrentUser.emailid %></span></div>
 <hr>
-<div id="fileminutes">
-
-
-
-
-
-
+<div class="card">
+        <div class="card-body" id="apendme">             </div>
 </div>
 
-
-</div>
 
 
 </div>
 <script>
 
+ 
+var user =<%-JSON.stringify(CurrentUser)%>;
+var cardtodispaly="";
+user.datastore.forEach(function(obj){
+
+cardtodispaly+='<section class="card card-inverse bg-light"><div class="card-body"><div class="row"><div class="col-md-12"><p>Event Name: '+obj.name+'</p></div></div><div class="row"><div class="col-md-4"></div><div class="col-md-4"></div><div class="col-md-4"><a href="/userminute?eventname='+obj.name+'" style="color:blue">see your minutes</a></div></div> </div> </section> ';
+
+
+})
+$('#apendme').append(cardtodispaly);
+
+
 
 
 </script>
+
+
+
 <% include partials/footer.ejs %>
 
